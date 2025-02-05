@@ -19,11 +19,11 @@ const chatController = catchAsyncErr(async (req: Request, res: Response) => {
 
     // Check if images is provided and is an array before passing it to getMessageFromBot
     if (Array.isArray(images)) {
-        // messageFromBot = await getMessageFromBot(updatedChat, images, from_chat);
-        messageFromBot = "bot message";
+        messageFromBot = await getMessageFromBot(updatedChat, images, from_chat);
+
     } else {
-        // messageFromBot = await getMessageFromBot(updatedChat, null, from_chat);
-        messageFromBot = "bot message";
+        messageFromBot = await getMessageFromBot(updatedChat, null, from_chat);
+
     }
 
     updatedChat = await chatInstance.addMessageToChat(device_id, updatedChat[0].chat_id, from_chat, messageFromBot, "Bot", images);
