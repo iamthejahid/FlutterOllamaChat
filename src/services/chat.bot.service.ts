@@ -3,56 +3,91 @@ import { Message, ChatModel } from "@main/models/chat.model";
 import { DoctorModel } from "@main/models/doctor.model";
 
 // Fetch available doctors
-const getAvailableDoctors = async () => {
-    const doctors = await DoctorModel.find();
-    return JSON.stringify(doctors.map((doc: { name: any; specialty: any; availableSlots: any; contact: any; }) => ({
-        name: doc.name,
-        specialty: doc.specialty,
-        availableSlots: doc.availableSlots,
-        contact: doc.contact,
-    })));
+const getAvailableDoctors = async (): Promise<string> => {
+    try {
+        const doctors = await DoctorModel.find();
+        return JSON.stringify(doctors.map((doc: { name: any; specialty: any; availableSlots: any; contact: any; }) => ({
+            name: doc.name,
+            specialty: doc.specialty,
+            availableSlots: doc.availableSlots,
+            contact: doc.contact,
+        })));
+    } catch (error) {
+        console.error("Error fetching doctors:", error);
+        return "[]"; // Return an empty array in case of failure
+    }
 };
 
 // Get chatbot response
 const getMessageFromBot = async (message: Message[], images: string[] | null, chatType: String): Promise<string> => {
-    const formattedMessages = [{
-        role: 'system',
-        content: "You are an AI medical assistant named Medihelper. Your primary role is to provide basic health suggestions and guidance to users. You will offer initial recommendations based on the symptoms or concerns shared by the user, but you will not prescribe any medication. While providing these basic suggestions, you will also try to understand the underlying cause of the issue. Once you have gathered enough information and identified the root cause, you will suggest an appropriate doctor from the list of available professionals who specialize in the relevant field.",
-    }].concat(
-        message.map((msg) => ({
-            role: msg.who,
-            content: msg.message
-        }))
-    );
+    try {
+        const formattedMessages = [
+            {
+                role: 'system',
+                content: `You are a medical healthcare assistant named MediHelper, working at Medicare Hospital. 
+                          Your primary role is to assist users by engaging in conversations, providing basic guidance, 
+                          and directing them to the right doctor when necessary.
 
-    const response = await ollama.chat({
-        model: 'llava',
-        messages: formattedMessages,
-    });
+                          Key Information:
+                          - Medicare Hospital has multiple doctors, retrievable via get_available_doctors.
+                          - Hotline: 16122.
+                          - Suggest home remedies for minor issues but do NOT prescribe medications.
+                          - If a doctor is available, suggest them first; otherwise, advise on the type of specialist needed.
+                          - If a user is interested in a doctor, politely ask for their name and phone number for follow-up.`,
 
-    // If the model decides to use a tool
-    if (response.message && response.message.tool_calls) {
-        const toolResponses: string[] = [];
+            },
+            ...message.map((msg) => ({
+                role: msg.who,
+                content: msg.message
+            }))
+        ];
 
-        // Loop through the tool calls and handle only if necessary
+        // Call the chatbot with the initial message
+        const response = await ollama.chat({
+            model: 'llama3.2',
+            messages: formattedMessages,
+            tools: [
+                {
+                    type: 'function',
+                    function: {
+                        name: 'get_available_doctors',
+                        description: 'Fetches the list of available doctors with their specialties and schedules',
+                        parameters: {
+                            type: "object",
+                            properties: {},
+                            required: [],
+                        },
+                    },
+                }
+            ]
+        });
+
+        if (!response.message?.tool_calls) {
+            return response.message?.content || "I'm sorry, I didn't understand that.";
+        }
+
+        // Handle function calling
+        const toolResponses: Record<string, string> = {};
         for (const tool of response.message.tool_calls) {
             if (tool.function.name === 'get_available_doctors') {
-                // Call the tool only if it is needed
-                toolResponses.push(await getAvailableDoctors());
+                toolResponses[tool.function.name] = await getAvailableDoctors();
             }
         }
 
-        // If any tool was called, process and send the result
-        if (toolResponses.length > 0) {
-            const finalResponse = await ollama.chat({
-                model: 'llava',
-                messages: [...formattedMessages, { role: 'tool', content: toolResponses.join('\n') }],
-            });
-            return finalResponse.message?.content || "I'm sorry, I didn't understand that.";
-        }
-    }
+        // Send function response back for final processing
+        const finalResponse = await ollama.chat({
+            model: 'llama3.2',  // Keeping model consistent
+            messages: [
+                ...formattedMessages,
+                { role: 'tool', content: JSON.stringify(toolResponses) }
+            ],
+        });
 
-    return response.message?.content || "I'm sorry, I didn't understand that.";
+        return finalResponse.message?.content || "I'm sorry, I didn't understand that.";
+    } catch (error) {
+        console.error("Error processing chatbot request:", error);
+        return "Apologies, but I am currently unable to process your request.";
+    }
 };
 
 export { getMessageFromBot };
