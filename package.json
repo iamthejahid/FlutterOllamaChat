@@ -59,6 +59,7 @@
     "morgan": "^1.10.0",
     "morgan-body": "^2.6.6",
     "nodemailer": "^6.7.3",
+    "ollama": "^0.5.12",
     "passport": "^0.6.0",
     "passport-http": "^0.3.0",
     "passport-jwt": "^4.0.0",

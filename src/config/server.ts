@@ -1,7 +1,6 @@
 require("dotenv/config");
 // Import Routes
-import authRoute from "@main/routes/auth.route";
-import userRoute from "@main/routes/user.route";
+import chatRoute from "@main/routes/chat.route";
 import bodyParser from "body-parser";
 import express, { Request, Response } from "express";
 import mongoSanitize from "express-mongo-sanitize";
@@ -13,8 +12,6 @@ import expressRateLimit from "./express-rate";
 import expressSlowDown from "./express-slow-down";
 import dbConnect from "./mongoose";
 import { expressDevLogger } from "./morgan";
-import passportHttpInit from "./passport-http";
-import passportJwtInit from "./passport-jwt";
 
 const xssClean = require("xss-clean");
 const swaggerFile = require("../../swagger");
@@ -31,8 +28,6 @@ export const createServer = async () => {
   server.use(expressDevLogger); // custom logger
 
   server.use(passport.initialize()); // passport authentication initialize
-  passport.use("basic", passportHttpInit); // passport http authentication initialize
-  passport.use("jwt", passportJwtInit); // passport jwt authentication initialize
 
   const indexRouter = express.Router();
   indexRouter.get("/", [], async (req: Request, res: Response) => {
@@ -42,8 +37,7 @@ export const createServer = async () => {
   // Router Connections
   server.use(indexRouter);
   server.use("/swagger-docs", swaggerUi.serve, swaggerUi.setup(swaggerFile)); // Swagger Routing
-  server.use("/api/auth", authRoute);
-  server.use("/api/user", userRoute);
+  server.use("/api/chat", chatRoute);
 
   if (process.env.NODE_ENVIRONMENT === "production") {
     server.use(expressRateLimit); // per window rate limit

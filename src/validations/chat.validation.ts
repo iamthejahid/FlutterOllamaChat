@@ -21,7 +21,7 @@ const imageChatMessage = {
 };
 
 
-const imageChatValidation = validateRequest(imageChatMessage);
+const chatValidation = validateRequest(imageChatMessage);
 
 
-export { imageChatValidation };
+export { chatValidation };
