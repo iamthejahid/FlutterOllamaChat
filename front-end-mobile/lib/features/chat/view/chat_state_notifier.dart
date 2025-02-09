@@ -1,4 +1,4 @@
-import 'package:flutter_ollama/features/chat/data/chat_repo.dart';
+import 'package:flutter_ollama/features/chat/repo/chat_repo.dart';
 import 'package:flutter_ollama/features/chat/view/chat_state.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
