@@ -1,308 +1,112 @@
 
-# Express, Mongodb, Typescript RestAPI Service
+# FlutterOllamaChat
 
-  
+## Overview
 
-## Clarification and credit 📜
+FlutterOllamaChat is a **proof of concept (POC)** project designed to explore AI-powered chatbot interactions using **Ollama** as the AI backend. The system consists of a **TypeScript-based REST API** with **MongoDB**, and a **Flutter front-end** for user interactions.
 
-This repo is direct copied and improvised from this [repo](git@github.com:morshedmasud/express-mongoDB-typescript-restAPI-starter.git). A big applause for the author [morshedmasud](https://github.com/morshedmasud) 👏👏👏
-  
+This project aims to develop an **AI model** that can be **hosted locally**, reducing reliance on cloud-based services like ChatGPT or Gemini, thereby eliminating API costs. A key focus is on **function tooling**, allowing the AI to retrieve real-time data—such as the availability of doctors in a fictional hospital—and provide informed recommendations to users.
 
-## Technology used 🛠️
+> **⚠️ Note:** This project is based on older templates and existing codebases, so some unused code may be present. It is intended for experimental purposes only.
 
-1. Node
-
-2. Express JS
-
-3. Typescript
-
-4. MongoDB
-
-  
+----------
 
 ## Features ✨
 
-* User SignIn/SignUp
+-   **AI-powered medical assistant**: A chatbot that helps users find doctors based on availability.
+-   **Function tooling integration**: AI can fetch real-time doctor availability using a MongoDB database.
+-   **Context-aware chat**: Conversations are stored, and previous messages are considered for better responses.
+-   **Local AI model**: Uses Ollama instead of cloud-based LLMs to reduce costs.
+-   **REST API**: Built with TypeScript, Express, and MongoDB.
+-   **Flutter front-end**: For user-friendly interactions.
 
-* Basic Authentication with jwt-http
+----------
 
-* OAuth 2.0 (Authentication with Access & Refresh Token)
+## Technology Stack 🛠️
 
-* Data Validation with JOI
+### **Backend:**
 
-* Unit Testing
+-   Node.js
+-   Express.js
+-   TypeScript
+-   MongoDB
+-   Ollama (local AI model)
 
-* Email Verification
+### **Frontend:**
 
-* Docker Configuration
+-   Flutter
 
-* Swagger Documentation
+----------
 
-  
+## API Details 🌐
 
-## Folder structure 📁
+### **Endpoint:**
 
-  
 
-```
+`POST http://localhost:3031/api/chat/textChat` 
 
-.
+### **Example Request Body:**
 
-├── .env.example
 
-├── .eslintrc.json
+`{
+    "device_id": "test-mobile",
+    "message": "Yes please!", 
+    "from_chat": "mobile",
+    "chat_id": "67a8c97ec7a9b707be0bcb59"
+}` 
 
-├── .git
+-   **If `chat_id` is provided** → The entire conversation history is sent to the AI for context.
+-   **If `chat_id` is missing** → A new conversation is started. It will return chat_id.
 
-│ ├── FETCH_HEAD
+### **AI Behavior:**
 
-│ ├── HEAD
+-   The AI model **MediHelper** acts as a virtual assistant at _Medicare Hospital_.
+-   It **retrieves doctor availability** via function tooling and provides recommendations.
+-   It **does not prescribe medication** but can suggest home remedies for minor issues.
+-   It may **ask for user details** (name, phone number) for follow-up with a doctor.
 
-│ ├── config
+----------
 
-│ ├── description
+## Setting Up Locally 🖥️
 
-│ ├── hooks
+### **1. Clone the Repository**
 
-│ │ ├── applypatch-msg.sample
 
-│ │ ├── commit-msg.sample
+`git clone <repository-url>
+cd FlutterOllamaChat` 
 
-│ │ ├── fsmonitor-watchman.sample
+### **2. Install Dependencies**
 
-│ │ ├── post-update.sample
 
-│ │ ├── pre-applypatch.sample
+`yarn install` 
 
-│ │ ├── pre-commit.sample
+### **3. Configure Environment Variables**
 
-│ │ ├── pre-merge-commit.sample
+Copy the `.env.example` file and rename it to `.env`, then update values like database info.
 
-│ │ ├── pre-push.sample
 
-│ │ ├── pre-rebase.sample
+`cp .env.example .env` 
 
-│ │ ├── pre-receive.sample
+### **4. Start MongoDB**
 
-│ │ ├── prepare-commit-msg.sample
+Make sure MongoDB is running locally or provide a connection string in `.env`.
 
-│ │ ├── push-to-checkout.sample
+### **5. Run the Backend**
 
-│ │ └── update.sample
 
-│ ├── index
+### Development server
+`yarn run dev`
 
-│ ├── info
 
-│ │ └── exclude
 
-│ ├── logs
+----------
 
-│ │ ├── HEAD
+## Acknowledgments 🙌
 
-│ │ └── refs
+This project is built upon an **Express, MongoDB, TypeScript REST API starter** from [morshedmasud](https://github.com/morshedmasud). Kudos to the original author! 👏
 
-│ ├── objects
+----------
 
-│ │ ├── info
+## ⚠️ Disclaimer
 
-│ │ └── pack
-
-│ ├── packed-refs
-
-│ └── refs
-
-│ ├── heads
-
-│ ├── remotes
-
-│ └── tags
-
-├── .gitignore
-
-├── Dockerfile
-
-├── README.md
-
-├── custom.d.ts
-
-├── docker-compose.yml
-
-├── jest.config.js
-
-├── package.json
-
-├── src
-
-│ ├── app.ts
-
-│ ├── config
-
-│ │ ├── cors.ts
-
-│ │ ├── express-rate.ts
-
-│ │ ├── express-slow-down.ts
-
-│ │ ├── logger.ts
-
-│ │ ├── mongoose.ts
-
-│ │ ├── morgan.ts
-
-│ │ ├── passport-http.ts
-
-│ │ ├── passport-jwt.ts
-
-│ │ └── server.ts
-
-│ ├── controllers
-
-│ │ ├── auth.controller.ts
-
-│ │ └── user.controller.ts
-
-│ ├── middleware
-
-│ │ └── auth.ts
-
-│ ├── models
-
-│ │ └── user.model.ts
-
-│ ├── routes
-
-│ │ ├── auth.route.ts
-
-│ │ └── user.route.ts
-
-│ ├── services
-
-│ │ ├── __tests__
-
-│ │ └── user.service.ts
-
-│ ├── utils
-
-│ │ ├── ApiError.ts
-
-│ │ ├── catchAsync.ts
-
-│ │ ├── constants.ts
-
-│ │ ├── email.ts
-
-│ │ ├── response.ts
-
-│ │ ├── tokens.ts
-
-│ │ └── validationError.ts
-
-│ └── validations
-
-│ └── auth.validation.ts
-
-├── swagger.json
-
-├── tsconfig.json
-
-└── yarn.lock
-
-```
-
-  
-  
-  
-
-## Setup in your local machine, and running  🖥️
-
-1. Clone project 🖱️
-
-```
-
-git clone git@github.com:morshedmasud/express-mongoDB-typescript-restAPI-starter.git
-
-```
-
-2. Go to project root path and install all dependency with 💻
-
-```
-
-yarn install
-
-```
-
-3. Don't forget to create **.env** file as like **.env.example** and put necessary values like DB Info, Email Info 🪵
-
-```shell script
-
-cp  .env.example  .env
-
-```
-
-4. Start your mongodb service 💾
-
-5. Run the project 🚀
-
-```shell script
-
-//  development  server
-
-yarn  run  dev
-
-  
-
-//  build  project
-
-yarn  build
-
-  
-
-//  production  server
-
-yarn  run  start
-
-```
-
-  
-
-6. Run With Docker 🛥️
-
-```shell script
-
-//  build
-
-sudo  docker-compose  build
-
-  
-
-//  run
-
-sudo  docker-compose  up
-
-```
-
-  
-
-7. Testing 🧪
-
-```shell script
-
-//  run  all  unit-test
-
-yarn  run  test:unit
-
-  
-
-//  run  individual  unit-test  file
-
-yarn  run  test:unit  src/services/__tests__/auth.ts
-
-```
-
-  
-  
-
-#### Open the following url for view swagger documentation
-
-## (http://localhost:3031/swagger-docs)
+This project is a **POC (Proof of Concept)** and should not be used for real medical consultations. The AI does **not replace professional medical advice**. Always consult a licensed healthcare professional for medical concerns.
