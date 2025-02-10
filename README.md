@@ -72,7 +72,7 @@ This project aims to develop an **AI model** that can be **hosted locally**, red
 ### **1. Clone the Repository**
 
 
-`git clone <repository-url>
+`git clone https://github.com/iamthejahid/FlutterOllamaChat
 cd FlutterOllamaChat` 
 
 ### **2. Install Dependencies**
